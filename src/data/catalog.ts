@@ -80,7 +80,7 @@ export const UNITS_BY_SUBJECT: Record<string, UnitTemplate[]> = {
     { title: "التاريخ والحضارة", description: "الحضارات القديمة والشخصيات" },
     { title: "المواطنة والوطن", description: "الحقوق والواجبات والانتماء" },
   ],
-};
+
 
 export interface LessonTemplate {
   title: string;
