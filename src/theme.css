@@ -1,0 +1,162 @@
+/* ============================================================
+   ملف تصميم "مسار" — مبني على نفس هوية تطبيق "تعلّم"
+   انسخ مجلد fonts/ + هذا الملف داخل src/ في مشروعك،
+   ثم استورده مرة واحدة في src/main.tsx:
+   import "./theme.css";
+   ============================================================ */
+
+/* -------- الخط: Cairo -------- */
+@font-face {
+  font-family: "Cairo Variable";
+  src: url("./fonts/cairo-arabic.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cairo Variable";
+  src: url("./fonts/cairo-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cairo Variable";
+  src: url("./fonts/cairo-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF;
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -------- نظام الألوان (كما في تعلّم) -------- */
+:root {
+  /* الأزرق الكحلي - أساسي للنصوص الغامقة والعناوين */
+  --color-navy-900: #102354;
+  --color-navy-800: #122452;
+
+  /* الأزرق - أساسي للأزرار والروابط والعناصر التفاعلية */
+  --color-primary: #2455d6;
+  --color-primary-hover: #2e63e6;
+
+  /* الذهبي - لون تمييز/تشجيع (نجوم، شارات، إنجازات) */
+  --color-accent-gold: #f6b91b;
+  --color-accent-gold-dark: #fcbb00;
+  --color-accent-gold-light: #ffd236;
+
+  /* تركواز - لون تكميلي للعناصر التعليمية */
+  --color-teal: #2dd4bf;
+
+  /* خلفيات فاتحة */
+  --color-bg: #f7faff;
+  --color-bg-soft: #eff6ff;
+  --color-bg-alt: #f2f5fa;
+  --color-surface: #ffffff;
+
+  /* نصوص */
+  --color-text: var(--color-navy-800);
+  --color-text-muted: #64748b;
+
+  /* الزوايا المدورة - سمة أساسية في التصميم */
+  --radius-sm: 15px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  /* الظلال - ناعمة وبتدرج كحلي بدل الأسود */
+  --shadow-sm: 0 10px 30px rgba(18, 36, 82, 0.07);
+  --shadow-md: 0 18px 42px rgba(18, 36, 82, 0.12);
+  --shadow-lg: 0 25px 50px rgba(18, 36, 82, 0.18);
+
+  --font-family: "Cairo Variable", "Cairo", Tahoma, Arial, sans-serif;
+}
+
+/* -------- إعدادات أساسية -------- */
+html, body {
+  direction: rtl;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* -------- عناصر أساسية جاهزة للاستخدام -------- */
+
+/* كارت */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* زر أساسي */
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 12px 28px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+/* زر ذهبي (تشجيعي / إنجاز) */
+.btn-accent {
+  background: var(--color-accent-gold);
+  color: var(--color-navy-900);
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 12px 28px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-accent:hover {
+  background: var(--color-accent-gold-dark);
+}
+
+/* شارة/تاج صغير */
+.badge {
+  display: inline-block;
+  background: var(--color-bg-soft);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* عنوان قسم */
+.section-title {
+  color: var(--color-navy-900);
+  font-weight: 800;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.section-subtitle {
+  color: var(--color-text-muted);
+  font-size: 15px;
+  margin-bottom: 20px;
+}
