@@ -15,6 +15,16 @@ import {
 
 type Screen = "splash" | "grade" | "subjects" | "units" | "lesson" | "quiz" | "result";
 
+// نفس هوية "تعلّم" — دورة ألوان ثابتة بدل الألوان العشوائية القديمة
+const GRADE_GRADIENTS: [string, string][] = [
+  ["#2455D6", "#122452"],
+  ["#F6B91B", "#FCBB00"],
+  ["#2DD4BF", "#2455D6"],
+  ["#122452", "#2455D6"],
+  ["#FCBB00", "#F6B91B"],
+  ["#2455D6", "#2DD4BF"],
+];
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("splash");
   const [gradeSlug, setGradeSlug] = useState<string>("");
@@ -56,7 +66,7 @@ export default function App() {
     setScreen("grade");
   }
 
-return (
+  return (
     <div style={styles.app}>
       {screen === "splash" && (
         <div style={styles.center}>
@@ -71,19 +81,22 @@ return (
         <div style={styles.screen}>
           <h2 style={styles.heading}>اختر مرحلتك الدراسية</h2>
           <div style={styles.grid}>
-            {GRADES.map((g) => (
-              <button
-                key={g.slug}
-                style={{ ...styles.card, background: `linear-gradient(135deg, ${g.colorFrom}, ${g.colorTo})` }}
-                onClick={() => {
-                  setGradeSlug(g.slug);
-                  setScreen("subjects");
-                }}
-              >
-                <div style={styles.cardTitle}>{g.name}</div>
-                <div style={styles.cardDesc}>{g.description}</div>
-              </button>
-            ))}
+            {GRADES.map((g, i) => {
+              const [from, to] = GRADE_GRADIENTS[i % GRADE_GRADIENTS.length];
+              return (
+                <button
+                  key={g.slug}
+                  style={{ ...styles.card, background: `linear-gradient(135deg, ${from}, ${to})` }}
+                  onClick={() => {
+                    setGradeSlug(g.slug);
+                    setScreen("subjects");
+                  }}
+                >
+                  <div style={styles.cardTitle}>{g.name}</div>
+                  <div style={styles.cardDesc}>{g.description}</div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -213,12 +226,14 @@ const ICONS: Record<string, string> = {
   globe: "🌍",
 };
 
+// ألوان وأشكال مبنية على هوية "تعلّم" (كحلي + أزرق + ذهبي، زوايا مدورة، ظلال ناعمة)
 const styles: Record<string, React.CSSProperties> = {
   app: {
     minHeight: "100vh",
-    background: "#0f172a",
-    color: "#f8fafc",
+    background: "#F7FAFF",
+    color: "#122452",
     direction: "rtl",
+    fontFamily: '"Cairo Variable", "Cairo", Tahoma, Arial, sans-serif',
   },
   center: {
     minHeight: "100vh",
@@ -231,61 +246,64 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
   },
   screen: { padding: 20, paddingBottom: 60 },
-  title: { fontSize: 28, margin: "8px 0" },
-  subtitle: { color: "#94a3b8", marginBottom: 16 },
-  heading: { fontSize: 20, margin: "12px 0" },
-  label: { color: "#93c5fd", fontWeight: 600, marginTop: 16, marginBottom: 4 },
-  body: { lineHeight: 1.8, color: "#e2e8f0" },
+  title: { fontSize: 28, margin: "8px 0", color: "#102354", fontWeight: 800 },
+  subtitle: { color: "#64748b", marginBottom: 16 },
+  heading: { fontSize: 20, margin: "12px 0", color: "#102354", fontWeight: 800 },
+  label: { color: "#2455D6", fontWeight: 700, marginTop: 16, marginBottom: 4 },
+  body: { lineHeight: 1.8, color: "#122452" },
   grid: { display: "flex", flexDirection: "column", gap: 12 },
   card: {
     border: "none",
-    borderRadius: 16,
-    padding: 18,
+    borderRadius: 28,
+    padding: 20,
     color: "white",
     textAlign: "right",
     cursor: "pointer",
+    boxShadow: "0 10px 30px rgba(18,36,82,0.15)",
   },
   subjectCard: {
-    border: "1px solid #334155",
-    background: "#1e293b",
-    borderRadius: 16,
-    padding: 16,
-    color: "white",
+    border: "none",
+    background: "#ffffff",
+    borderRadius: 24,
+    padding: 18,
+    color: "#122452",
     textAlign: "right",
     cursor: "pointer",
+    boxShadow: "0 10px 30px rgba(18,36,82,0.07)",
   },
   unitRow: {
     display: "block",
     width: "100%",
-    border: "1px solid #334155",
-    background: "#1e293b",
-    borderRadius: 14,
-    padding: 16,
-    color: "white",
+    border: "none",
+    background: "#ffffff",
+    borderRadius: 22,
+    padding: 18,
+    color: "#122452",
     textAlign: "right",
-    marginBottom: 10,
+    marginBottom: 12,
     cursor: "pointer",
+    boxShadow: "0 10px 30px rgba(18,36,82,0.07)",
   },
   optionRow: {
     display: "block",
     width: "100%",
-    border: "1px solid #334155",
-    background: "#1e293b",
-    borderRadius: 12,
+    border: "1px solid #E2E8F0",
+    background: "#ffffff",
+    borderRadius: 18,
     padding: 14,
-    color: "white",
+    color: "#122452",
     textAlign: "right",
     marginBottom: 10,
     fontSize: 16,
     cursor: "pointer",
   },
-  cardTitle: { fontWeight: 700, fontSize: 16 },
+  cardTitle: { fontWeight: 800, fontSize: 16 },
   cardDesc: { fontSize: 13, opacity: 0.85, marginTop: 4 },
   primaryBtn: {
-    background: "#2563eb",
+    background: "#2455D6",
     color: "white",
     border: "none",
-    borderRadius: 14,
+    borderRadius: 999,
     padding: "14px 28px",
     fontSize: 16,
     fontWeight: 700,
@@ -294,23 +312,24 @@ const styles: Record<string, React.CSSProperties> = {
   },
   secondaryBtn: {
     background: "transparent",
-    color: "#94a3b8",
-    border: "1px solid #334155",
-    borderRadius: 14,
+    color: "#64748b",
+    border: "1px solid #CBD5E1",
+    borderRadius: 999,
     padding: "10px 24px",
     fontSize: 14,
     cursor: "pointer",
     marginTop: 8,
   },
   audioBadge: {
-    background: "#1e3a8a",
-    color: "#bfdbfe",
+    background: "#EFF6FF",
+    color: "#2455D6",
     padding: "8px 12px",
-    borderRadius: 10,
+    borderRadius: 14,
     fontSize: 13,
     marginBottom: 8,
+    fontWeight: 600,
   },
   backBar: { display: "flex", alignItems: "center", gap: 12, marginBottom: 8 },
-  backBtn: { background: "none", border: "none", color: "#93c5fd", fontSize: 15, cursor: "pointer" },
-  backTitle: { color: "#94a3b8", fontSize: 14 },
+  backBtn: { background: "none", border: "none", color: "#2455D6", fontSize: 15, cursor: "pointer", fontWeight: 700 },
+  backTitle: { color: "#64748b", fontSize: 14 },
 };
