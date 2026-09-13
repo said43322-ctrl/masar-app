@@ -1,4 +1,4 @@
-}
+
 
 
 export function questionsForLessonKG1(subjectSlug: string, lessonIdx: number): QuizQ[] {
