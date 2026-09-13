@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.masar.education",
-  appName: "مسار",
+  appName: "تعلم",
   webDir: "dist",
   bundledWebRuntime: false,
 };
