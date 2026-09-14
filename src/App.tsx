@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+
 import {
   GRADES,
   SUBJECTS,
@@ -14,16 +15,6 @@ import {
 } from "./data/catalog";
 
 type Screen = "splash" | "grade" | "subjects" | "units" | "lesson" | "quiz" | "result";
-
-// نفس هوية "تعلّم" — دورة ألوان ثابتة بدل الألوان العشوائية القديمة
-const GRADE_GRADIENTS: [string, string][] = [
-  ["#2455D6", "#122452"],
-  ["#F6B91B", "#FCBB00"],
-  ["#2DD4BF", "#2455D6"],
-  ["#122452", "#2455D6"],
-  ["#FCBB00", "#F6B91B"],
-  ["#2455D6", "#2DD4BF"],
-];
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("splash");
@@ -69,34 +60,43 @@ export default function App() {
   return (
     <div style={styles.app}>
       {screen === "splash" && (
-        <div style={styles.center}>
-          <div style={{ fontSize: 64 }}>🎓</div>
-          <h1 style={styles.title}>تعلّم</h1>
-          <p style={styles.subtitle}>طريقك للنجاح يبدأ من هنا</p>
-          <button style={styles.primaryBtn} onClick={goHome}>ابدأ الآن ›</button>
+        <div style={styles.splashWrap}>
+          <div style={styles.splashGlowBlue} />
+          <div style={styles.splashGlowAmber} />
+          <div style={styles.center}>
+            <span style={styles.logoBadge}>🎓</span>
+            <h1 style={styles.title}>تَعَلَّم</h1>
+            <span style={styles.tagline}>اِفْهَم • تَقَدَّم • تَمَيَّز</span>
+            <p style={styles.subtitle}>طريقك للنجاح يبدأ من هنا</p>
+            <button style={styles.primaryBtn} onClick={goHome}>
+              ابدأ رحلتك الآن
+              <span style={styles.btnArrowCircle}>›</span>
+            </button>
+          </div>
         </div>
       )}
 
       {screen === "grade" && (
         <div style={styles.screen}>
-          <h2 style={styles.heading}>اختر مرحلتك الدراسية</h2>
+          <div style={styles.welcomeBox}>
+            <span style={styles.welcomeEmoji}>👋</span>
+            <h2 style={styles.welcomeTitle}>أهلًا بك يا بطل!</h2>
+            <p style={styles.welcomeSub}>اختر مرحلتك وصفّك الدراسي لنجهّز لك المحتوى المناسب.</p>
+          </div>
           <div style={styles.grid}>
-            {GRADES.map((g, i) => {
-              const [from, to] = GRADE_GRADIENTS[i % GRADE_GRADIENTS.length];
-              return (
-                <button
-                  key={g.slug}
-                  style={{ ...styles.card, background: `linear-gradient(135deg, ${from}, ${to})` }}
-                  onClick={() => {
-                    setGradeSlug(g.slug);
-                    setScreen("subjects");
-                  }}
-                >
-                  <div style={styles.cardTitle}>{g.name}</div>
-                  <div style={styles.cardDesc}>{g.description}</div>
-                </button>
-              );
-            })}
+            {GRADES.map((g) => (
+              <button
+                key={g.slug}
+                style={{ ...styles.card, background: `linear-gradient(135deg, ${g.colorFrom}, ${g.colorTo})` }}
+                onClick={() => {
+                  setGradeSlug(g.slug);
+                  setScreen("subjects");
+                }}
+              >
+                <div style={styles.cardTitle}>{g.name}</div>
+                <div style={styles.cardDesc}>{g.description}</div>
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -104,7 +104,8 @@ export default function App() {
       {screen === "subjects" && grade && (
         <div style={styles.screen}>
           <BackBar onBack={() => setScreen("grade")} title={grade.name} />
-          <h2 style={styles.heading}>المواد الدراسية</h2>
+          <h2 style={styles.heading}>ماذا تريد أن تتعلّم اليوم؟</h2>
+          <p style={styles.headingSub}>اختر مادة، ولنبدأ درسًا جديدًا معًا.</p>
           <div style={styles.grid}>
             {SUBJECTS.map((s) => (
               <button
@@ -115,7 +116,7 @@ export default function App() {
                   setScreen("units");
                 }}
               >
-                <div style={{ fontSize: 28 }}>{ICONS[s.icon] ?? "📘"}</div>
+                <span style={styles.subjectIconBadge}>{ICONS[s.icon] ?? "📘"}</span>
                 <div style={styles.cardTitle}>{s.name}</div>
               </button>
             ))}
@@ -137,8 +138,11 @@ export default function App() {
                 setScreen("lesson");
               }}
             >
-              <div style={styles.cardTitle}>{`الوحدة ${i + 1}: ${u.title}`}</div>
-              <div style={styles.cardDesc}>{u.description}</div>
+              <span style={styles.unitNumber}>{i + 1}</span>
+              <span style={styles.unitTextWrap}>
+                <span style={styles.cardTitle}>{u.title}</span>
+                <span style={styles.cardDesc}>{u.description}</span>
+              </span>
             </button>
           ))}
         </div>
@@ -151,12 +155,14 @@ export default function App() {
           {lesson.audioPriority && (
             <div style={styles.audioBadge}>🔊 درس بأولوية الاستماع — استمع وكرّر بصوتك</div>
           )}
-          <p style={styles.label}>الأهداف</p>
-          <p style={styles.body}>{lesson.objectives}</p>
-          <p style={styles.label}>الشرح</p>
-          <p style={{ ...styles.body, whiteSpace: "pre-line" }}>{lesson.content}</p>
-          <p style={styles.label}>أمثلة</p>
-          <p style={styles.body}>{lesson.examples}</p>
+          <div style={styles.lessonCard}>
+            <p style={styles.label}>الأهداف</p>
+            <p style={styles.body}>{lesson.objectives}</p>
+            <p style={styles.label}>الشرح</p>
+            <p style={{ ...styles.body, whiteSpace: "pre-line" }}>{lesson.content}</p>
+            <p style={styles.label}>أمثلة</p>
+            <p style={styles.body}>{lesson.examples}</p>
+          </div>
           <button
             style={styles.primaryBtn}
             onClick={() => {
@@ -165,7 +171,8 @@ export default function App() {
               setScreen("quiz");
             }}
           >
-            جرّب بنفسك ›
+            جرّب بنفسك
+            <span style={styles.btnArrowCircle}>›</span>
           </button>
         </div>
       )}
@@ -173,6 +180,14 @@ export default function App() {
       {screen === "quiz" && questions.length > 0 && (
         <div style={styles.screen}>
           <BackBar onBack={() => setScreen("lesson")} title="اختبار" />
+          <div style={styles.quizProgressTrack}>
+            <div
+              style={{
+                ...styles.quizProgressFill,
+                width: `${((quizIdx + 1) / questions.length) * 100}%`,
+              }}
+            />
+          </div>
           <p style={styles.label}>السؤال {quizIdx + 1} من {questions.length}</p>
           <h2 style={styles.heading}>{questions[quizIdx].q}</h2>
           {questions[quizIdx].opts.map((opt, oi) => (
@@ -198,10 +213,13 @@ export default function App() {
 
       {screen === "result" && (
         <div style={styles.center}>
-          <div style={{ fontSize: 64 }}>🏆</div>
-          <h1 style={styles.title}>أحسنت!</h1>
-          <p style={styles.subtitle}>{`${score} / ${questions.length}`}</p>
-          <button style={styles.primaryBtn} onClick={() => setScreen("units")}>الدرس التالي</button>
+          <span style={styles.trophyBadge}>🏆</span>
+          <h1 style={styles.title}>أحسنت يا بطل!</h1>
+          <p style={styles.resultScore}>{`${score} / ${questions.length}`}</p>
+          <button style={styles.primaryBtn} onClick={() => setScreen("units")}>
+            الدرس التالي
+            <span style={styles.btnArrowCircle}>›</span>
+          </button>
           <button style={styles.secondaryBtn} onClick={goHome}>الرئيسية</button>
         </div>
       )}
@@ -226,16 +244,57 @@ const ICONS: Record<string, string> = {
   globe: "🌍",
 };
 
-// ألوان وأشكال مبنية على هوية "تعلّم" (كحلي + أزرق + ذهبي، زوايا مدورة، ظلال ناعمة)
+const COLORS = {
+  primary: "#2455D6",
+  primaryDark: "#102354",
+  primaryMid: "#2E63E6",
+  accent: "#F6B91B",
+  accentHover: "#ffc62e",
+  bg: "#F7F9FE",
+  cardBg: "#FFFFFF",
+  border: "#E3EAFB",
+  textDark: "#102354",
+  textMuted: "#64748B",
+};
+
+const FONT = "'Cairo', 'Tahoma', Arial, sans-serif";
+
 const styles: Record<string, React.CSSProperties> = {
   app: {
     minHeight: "100vh",
-    background: "#F7FAFF",
-    color: "#122452",
+    background: COLORS.bg,
+    color: COLORS.textDark,
     direction: "rtl",
-    fontFamily: '"Cairo Variable", "Cairo", Tahoma, Arial, sans-serif',
+    fontFamily: FONT,
+  },
+  splashWrap: {
+    position: "relative",
+    minHeight: "100vh",
+    overflow: "hidden",
+  },
+  splashGlowBlue: {
+    position: "absolute",
+    top: -60,
+    right: -80,
+    width: 260,
+    height: 260,
+    borderRadius: "50%",
+    background: "rgba(37,79,161,.12)",
+    filter: "blur(40px)",
+  },
+  splashGlowAmber: {
+    position: "absolute",
+    bottom: -40,
+    left: -60,
+    width: 220,
+    height: 220,
+    borderRadius: "50%",
+    background: "rgba(246,185,27,.18)",
+    filter: "blur(40px)",
   },
   center: {
+    position: "relative",
+    zIndex: 1,
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
@@ -243,93 +302,208 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     padding: 24,
     textAlign: "center",
-    gap: 8,
+    gap: 6,
   },
-  screen: { padding: 20, paddingBottom: 60 },
-  title: { fontSize: 28, margin: "8px 0", color: "#102354", fontWeight: 800 },
-  subtitle: { color: "#64748b", marginBottom: 16 },
-  heading: { fontSize: 20, margin: "12px 0", color: "#102354", fontWeight: 800 },
-  label: { color: "#2455D6", fontWeight: 700, marginTop: 16, marginBottom: 4 },
-  body: { lineHeight: 1.8, color: "#122452" },
-  grid: { display: "flex", flexDirection: "column", gap: 12 },
+  logoBadge: {
+    display: "grid",
+    placeItems: "center",
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    background: COLORS.primary,
+    color: "white",
+    fontSize: 34,
+    boxShadow: "0 10px 24px rgba(36,85,214,.35)",
+    marginBottom: 6,
+  },
+  title: { fontSize: 30, fontWeight: 900, margin: "6px 0 0", color: COLORS.textDark },
+  tagline: {
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 1,
+    color: COLORS.textMuted,
+    marginBottom: 10,
+  },
+  subtitle: { color: COLORS.textMuted, marginBottom: 20, fontSize: 15 },
+  screen: { padding: 20, paddingBottom: 60, maxWidth: 560, margin: "0 auto" },
+  welcomeBox: { textAlign: "center", marginBottom: 22, marginTop: 8 },
+  welcomeEmoji: { fontSize: 34, display: "block", marginBottom: 6 },
+  welcomeTitle: { fontSize: 22, fontWeight: 900, color: COLORS.textDark, margin: "4px 0" },
+  welcomeSub: { color: COLORS.textMuted, fontSize: 14, fontWeight: 600 },
+  heading: { fontSize: 20, fontWeight: 900, margin: "12px 0 2px", color: COLORS.textDark },
+  headingSub: { color: COLORS.textMuted, fontSize: 13, fontWeight: 600, marginBottom: 14 },
+  label: { color: COLORS.primaryMid, fontWeight: 800, marginTop: 16, marginBottom: 4, fontSize: 13 },
+  body: { lineHeight: 1.9, color: "#334155", fontSize: 15 },
+  grid: { display: "flex", flexDirection: "column", gap: 14, marginTop: 8 },
   card: {
     border: "none",
-    borderRadius: 28,
+    borderRadius: 20,
     padding: 20,
     color: "white",
     textAlign: "right",
     cursor: "pointer",
-    boxShadow: "0 10px 30px rgba(18,36,82,0.15)",
+    fontFamily: FONT,
+    boxShadow: "0 12px 24px rgba(16,35,84,.18)",
   },
   subjectCard: {
-    border: "none",
-    background: "#ffffff",
-    borderRadius: 24,
-    padding: 18,
-    color: "#122452",
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    border: `1px solid ${COLORS.border}`,
+    background: COLORS.cardBg,
+    borderRadius: 18,
+    padding: 16,
+    color: COLORS.textDark,
     textAlign: "right",
     cursor: "pointer",
-    boxShadow: "0 10px 30px rgba(18,36,82,0.07)",
+    fontFamily: FONT,
+    boxShadow: "0 4px 14px rgba(16,35,84,.06)",
+  },
+  subjectIconBadge: {
+    display: "grid",
+    placeItems: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    background: "#EFF6FF",
+    fontSize: 22,
+    flexShrink: 0,
   },
   unitRow: {
-    display: "block",
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 12,
     width: "100%",
-    border: "none",
-    background: "#ffffff",
-    borderRadius: 22,
-    padding: 18,
-    color: "#122452",
+    border: `1px solid ${COLORS.border}`,
+    background: COLORS.cardBg,
+    borderRadius: 18,
+    padding: 16,
+    color: COLORS.textDark,
     textAlign: "right",
     marginBottom: 12,
     cursor: "pointer",
-    boxShadow: "0 10px 30px rgba(18,36,82,0.07)",
+    fontFamily: FONT,
+    boxShadow: "0 4px 14px rgba(16,35,84,.06)",
+  },
+  unitNumber: {
+    display: "grid",
+    placeItems: "center",
+    minWidth: 32,
+    height: 32,
+    borderRadius: 10,
+    background: COLORS.primary,
+    color: "white",
+    fontWeight: 800,
+    fontSize: 14,
+    flexShrink: 0,
+  },
+  unitTextWrap: { display: "flex", flexDirection: "column", gap: 2 },
+  lessonCard: {
+    background: COLORS.cardBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 18,
+    padding: 16,
+    marginTop: 10,
+    boxShadow: "0 4px 14px rgba(16,35,84,.06)",
   },
   optionRow: {
     display: "block",
     width: "100%",
-    border: "1px solid #E2E8F0",
-    background: "#ffffff",
-    borderRadius: 18,
+    border: `1px solid ${COLORS.border}`,
+    background: COLORS.cardBg,
+    borderRadius: 14,
     padding: 14,
-    color: "#122452",
+    color: COLORS.textDark,
     textAlign: "right",
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: 700,
     cursor: "pointer",
+    fontFamily: FONT,
   },
   cardTitle: { fontWeight: 800, fontSize: 16 },
   cardDesc: { fontSize: 13, opacity: 0.85, marginTop: 4 },
   primaryBtn: {
-    background: "#2455D6",
-    color: "white",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 10,
+    background: COLORS.accent,
+    color: COLORS.primaryDark,
     border: "none",
-    borderRadius: 999,
-    padding: "14px 28px",
+    borderRadius: 16,
+    padding: "14px 26px",
     fontSize: 16,
-    fontWeight: 700,
+    fontWeight: 900,
     cursor: "pointer",
-    marginTop: 12,
+    marginTop: 16,
+    fontFamily: FONT,
+    boxShadow: "0 12px 24px rgba(246,185,27,.30)",
+  },
+  btnArrowCircle: {
+    display: "grid",
+    placeItems: "center",
+    width: 26,
+    height: 26,
+    borderRadius: "50%",
+    background: "rgba(255,255,255,.6)",
+    fontSize: 15,
   },
   secondaryBtn: {
     background: "transparent",
-    color: "#64748b",
-    border: "1px solid #CBD5E1",
-    borderRadius: 999,
+    color: COLORS.textMuted,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 14,
     padding: "10px 24px",
     fontSize: 14,
+    fontWeight: 700,
     cursor: "pointer",
-    marginTop: 8,
+    marginTop: 10,
+    fontFamily: FONT,
   },
   audioBadge: {
     background: "#EFF6FF",
-    color: "#2455D6",
-    padding: "8px 12px",
-    borderRadius: 14,
+    color: COLORS.primary,
+    padding: "10px 14px",
+    borderRadius: 12,
     fontSize: 13,
+    fontWeight: 700,
     marginBottom: 8,
-    fontWeight: 600,
+    marginTop: 6,
   },
+  quizProgressTrack: {
+    height: 6,
+    width: "100%",
+    background: "#E2E8F0",
+    borderRadius: 999,
+    overflow: "hidden",
+    marginTop: 6,
+  },
+  quizProgressFill: {
+    height: "100%",
+    background: COLORS.primary,
+    borderRadius: 999,
+    transition: "width .3s ease",
+  },
+  trophyBadge: {
+    display: "grid",
+    placeItems: "center",
+    width: 84,
+    height: 84,
+    borderRadius: "50%",
+    background: "#FEF3C6",
+    fontSize: 40,
+    marginBottom: 8,
+  },
+  resultScore: { color: COLORS.textMuted, marginBottom: 8, fontSize: 20, fontWeight: 900 },
   backBar: { display: "flex", alignItems: "center", gap: 12, marginBottom: 8 },
-  backBtn: { background: "none", border: "none", color: "#2455D6", fontSize: 15, cursor: "pointer", fontWeight: 700 },
-  backTitle: { color: "#64748b", fontSize: 14 },
+  backBtn: {
+    background: "none",
+    border: "none",
+    color: COLORS.primaryMid,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: "pointer",
+    fontFamily: FONT,
+  },
+  backTitle: { color: COLORS.textMuted, fontSize: 14, fontWeight: 700 },
 };
