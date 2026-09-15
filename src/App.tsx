@@ -1,3 +1,185 @@
+import { useMemo, useState } from "react";
+
+import {
+  GRADES,
+  STAGES,
+  SUBJECTS,
+  UNITS_BY_SUBJECT,
+  UNITS_BY_SUBJECT_KG1,
+  lessonsForUnit,
+  lessonsForUnitKG1,
+  questionsForLesson,
+  questionsForLessonKG1,
+  gradeBySlug,
+  subjectBySlug,
+  type QuizQ,
+} from "./data/catalog";
+
+type Screen = "splash" | "grade" | "subjects" | "units" | "lesson" | "quiz" | "result";
+
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("splash");
+  const [gradeSlug, setGradeSlug] = useState<string>("");
+  const [subjectSlug, setSubjectSlug] = useState<string>("");
+  const [unitTitle, setUnitTitle] = useState<string>("");
+  const [lessonIdx, setLessonIdx] = useState<number>(0);
+  const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
+  const [quizIdx, setQuizIdx] = useState(0);
+
+  const isKg1 = gradeSlug === "kg1";
+  const grade = gradeBySlug(gradeSlug);
+  const subject = subjectBySlug(subjectSlug);
+
+  const units = useMemo(() => {
+    if (!subjectSlug) return [];
+    return isKg1 ? UNITS_BY_SUBJECT_KG1[subjectSlug] ?? [] : UNITS_BY_SUBJECT[subjectSlug] ?? [];
+  }, [subjectSlug, isKg1]);
+
+  const unitIdx = units.findIndex((u) => u.title === unitTitle);
+
+  const lessons = useMemo(() => {
+    if (!subjectSlug || !unitTitle) return [];
+    return isKg1
+      ? lessonsForUnitKG1(subjectSlug, unitTitle)
+      : lessonsForUnit(subjectSlug, unitTitle, grade?.name ?? "");
+  }, [subjectSlug, unitTitle, isKg1, grade]);
+
+  const lesson = lessons[lessonIdx];
+
+  const questions: QuizQ[] = useMemo(() => {
+    if (!subjectSlug) return [];
+    const idx = lessonIdx + (unitIdx >= 0 ? unitIdx : 0);
+    return isKg1 ? questionsForLessonKG1(subjectSlug, idx) : questionsForLesson(subjectSlug, idx);
+  }, [subjectSlug, lessonIdx, unitIdx, isKg1]);
+
+  const score = quizAnswers.reduce((acc, ans, i) => acc + (ans === questions[i]?.correct ? 1 : 0), 0);
+
+  function goHome() {
+    setScreen("grade");
+  }
+
+  return (
+    <div style={styles.app}>
+      {screen === "splash" && (
+        <div style={styles.splashWrap}>
+          <div style={styles.splashGlowBlue} />
+          <div style={styles.splashGlowAmber} />
+
+          <div style={styles.heroTopBar}>
+            <button style={styles.studentLoginBtn} onClick={goHome}>دخول الطالب</button>
+            <div style={styles.heroBrandRow}>
+              <div style={styles.heroBrandText}>
+                <span style={styles.heroBrandTitle}>تَعَلَّم</span>
+                <span style={styles.tagline}>اِفْهَم • تَقَدَّم • تَمَيَّز</span>
+              </div>
+              <span style={styles.heroLogoBadge}>🎓</span>
+            </div>
+          </div>
+
+          <div style={styles.heroBody}>
+            <span style={styles.pillChip}>✨ تعلّم بذكاء، وتقدّم بثقة</span>
+
+            <h1 style={styles.heroHeading}>
+              كلُّ درسٍ يقرّبك
+              <br />
+              <span style={styles.heroHeadingAccent}>من حُلمك</span>
+            </h1>
+
+            <p style={styles.heroParagraph}>
+              رحلة تعليمية ممتعة، دروس مبسّطة واختبارات تفاعلية تساعدك على فهم موادك وتحقيق أفضل النتائج.
+            </p>
+
+            <button style={styles.primaryBtn} onClick={goHome}>
+              <span style={styles.btnArrowCircle}>←</span>
+              ابدأ رحلتك الآن
+            </button>
+
+            <div style={styles.socialProofRow}>
+              <div style={styles.avatarStack}>
+                <span style={{ ...styles.avatarCircle, background: "#FFD7A8" }}>ع</span>
+                <span style={{ ...styles.avatarCircle, background: "#A8F0D1" }}>س</span>
+                <span style={{ ...styles.avatarCircle, background: "#D6C9FA" }}>م</span>
+              </div>
+              <span style={styles.socialProofText}>أكثر من +10 آلاف طالب يتعلّم معنا</span>
+            </div>
+
+            <div style={styles.checksRow}>
+              <span style={styles.checkItem}>✅ محتوى مطابق للمنهج</span>
+              <span style={styles.checkItem}>✅ يعمل على كل الأجهزة</span>
+            </div>
+
+            <div style={styles.progressPeekCard}>
+              <span style={styles.progressPeekLabel}>🏆 تقدّمك اليوم</span>
+              <div style={styles.quizProgressTrack}>
+                <div style={{ ...styles.quizProgressFill, width: "35%" }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === "grade" && (
+        <div style={styles.screen}>
+          <div style={styles.topBar}>
+            <span style={styles.topBarIconBtn}>☰</span>
+            <span style={styles.topBarTitle}>اختيار المرحلة الدراسية</span>
+            <span style={styles.topBarRightCluster}>
+              <span style={styles.topBarBell}>
+                🔔
+                <span style={styles.topBarBellDot} />
+              </span>
+              <span style={styles.topAvatar}>ط</span>
+            </span>
+          </div>
+
+          <span style={styles.sectionTag}>✨ لنبدأ من هنا</span>
+          <div style={styles.welcomeBox}>
+            <span style={styles.welcomeEmoji}>👋</span>
+            <h2 style={styles.welcomeTitle}>أهلًا بك يا بطل!</h2>
+            <p style={styles.welcomeSub}>اختر مرحلتك وصفّك الدراسي لنجهّز لك المحتوى المناسب.</p>
+          </div>
+
+          <div style={styles.achievementCard}>
+            <span style={styles.achievementIcon}>🏅</span>
+            <span style={styles.unitTextWrap}>
+              <span style={styles.achievementLabel}>إنجازاتك</span>
+              <span style={styles.achievementText}>ابدأ أول اختبار وتابع تقدّمك هنا</span>
+            </span>
+          </div>
+
+          {STAGES.map((stage) => {
+            const stageGrades = GRADES.filter((g) => g.stage === stage.key);
+            return (
+              <div key={stage.key} style={styles.stageGroupCard}>
+                <div style={styles.stageHeaderRow}>
+                  <span style={styles.stageIconBadge}>{STAGE_ICONS[stage.key]}</span>
+                  <span style={styles.unitTextWrap}>
+                    <span style={styles.stageTitle}>{stage.label}</span>
+                    <span style={styles.stageHint}>{stage.hint}</span>
+                  </span>
+                </div>
+                <div style={styles.stageGradeGrid}>
+                  {stageGrades.map((g) => (
+                    <button
+                      key={g.slug}
+                      style={styles.gradeChip}
+                      onClick={() => {
+                        setGradeSlug(g.slug);
+                        setScreen("subjects");
+                      }}
+                    >
+                      <span style={styles.gradeChipDot} />
+                      {g.slug === "g1" && <span style={styles.popularBadge}>شائع</span>}
+                      <span style={styles.gradeChipName}>{g.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {screen === "subjects" && grade && (
         <div style={styles.screen}>
           <BackBar onBack={() => setScreen("grade")} title={grade.name} />
@@ -133,6 +315,12 @@ function BackBar({ onBack, title }: { onBack: () => void; title: string }) {
   );
 }
 
+const STAGE_ICONS: Record<string, string> = {
+  early: "✨",
+  primary: "📖",
+  prep: "🧭",
+};
+
 const ICONS: Record<string, string> = {
   calculator: "🧮",
   book: "📗",
@@ -189,6 +377,96 @@ const styles: Record<string, React.CSSProperties> = {
     background: "rgba(246,185,27,.18)",
     filter: "blur(40px)",
   },
+  heroTopBar: {
+    position: "relative",
+    zIndex: 1,
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    padding: "20px 20px 0",
+  },
+  studentLoginBtn: {
+    background: COLORS.cardBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 999,
+    padding: "10px 18px",
+    fontSize: 13,
+    fontWeight: 800,
+    color: COLORS.textDark,
+    cursor: "pointer",
+    fontFamily: FONT,
+    boxShadow: "0 4px 10px rgba(16,35,84,.06)",
+  },
+  heroBrandRow: { display: "flex", alignItems: "center", gap: 10 },
+  heroBrandText: { display: "flex", flexDirection: "column", alignItems: "flex-end" },
+  heroBrandTitle: { fontSize: 20, fontWeight: 900, color: COLORS.textDark },
+  heroLogoBadge: {
+    display: "grid",
+    placeItems: "center",
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    background: COLORS.primary,
+    color: "white",
+    fontSize: 20,
+    boxShadow: "0 8px 18px rgba(36,85,214,.30)",
+  },
+  heroBody: {
+    position: "relative",
+    zIndex: 1,
+    padding: "28px 24px 40px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+    gap: 14,
+  },
+  pillChip: {
+    display: "inline-block",
+    background: COLORS.cardBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 999,
+    padding: "8px 16px",
+    fontSize: 13,
+    fontWeight: 800,
+    color: COLORS.primary,
+    boxShadow: "0 4px 10px rgba(16,35,84,.06)",
+  },
+  heroHeading: { fontSize: 32, fontWeight: 900, lineHeight: 1.35, color: COLORS.textDark, margin: "6px 0" },
+  heroHeadingAccent: {
+    color: COLORS.primary,
+    borderBottom: `6px solid ${COLORS.accent}`,
+    paddingBottom: 2,
+  },
+  heroParagraph: { color: COLORS.textMuted, fontSize: 15, lineHeight: 1.9, maxWidth: 340 },
+  socialProofRow: { display: "flex", alignItems: "center", gap: 10, marginTop: 6 },
+  avatarStack: { display: "flex" },
+  avatarCircle: {
+    display: "grid",
+    placeItems: "center",
+    width: 30,
+    height: 30,
+    borderRadius: "50%",
+    fontWeight: 900,
+    fontSize: 13,
+    color: COLORS.textDark,
+    border: "2px solid white",
+    marginInlineStart: -8,
+  },
+  socialProofText: { fontSize: 13, fontWeight: 700, color: COLORS.textMuted },
+  checksRow: { display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" },
+  checkItem: { fontSize: 13, fontWeight: 700, color: COLORS.textDark },
+  progressPeekCard: {
+    marginTop: 18,
+    width: "100%",
+    maxWidth: 340,
+    background: COLORS.cardBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 18,
+    padding: 16,
+    boxShadow: "0 10px 24px rgba(16,35,84,.10)",
+  },
+  progressPeekLabel: { fontSize: 13, fontWeight: 800, color: COLORS.textDark, marginBottom: 8, display: "block" },
   center: {
     position: "relative",
     zIndex: 1,
@@ -241,6 +519,123 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     fontFamily: FONT,
     boxShadow: "0 12px 24px rgba(16,35,84,.18)",
+  },
+  topBar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+  topBarIconBtn: { fontSize: 20, color: COLORS.textDark },
+  topBarTitle: { fontSize: 15, fontWeight: 800, color: COLORS.textDark },
+  topBarRightCluster: { display: "flex", alignItems: "center", gap: 10 },
+  topBarBell: { position: "relative", fontSize: 18 },
+  topBarBellDot: {
+    position: "absolute",
+    top: -2,
+    left: -2,
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#EF4444",
+    border: "2px solid white",
+  },
+  topAvatar: {
+    display: "grid",
+    placeItems: "center",
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    background: "#E0E7FF",
+    color: COLORS.primaryDark,
+    fontWeight: 900,
+    fontSize: 14,
+  },
+  sectionTag: {
+    display: "block",
+    color: "#F59E0B",
+    fontWeight: 800,
+    fontSize: 13,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  achievementCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    background: "#EFF6FF",
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 20,
+  },
+  achievementIcon: {
+    display: "grid",
+    placeItems: "center",
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    background: COLORS.primary,
+    fontSize: 20,
+  },
+  achievementLabel: { color: COLORS.primary, fontWeight: 800, fontSize: 13 },
+  achievementText: { color: COLORS.textDark, fontWeight: 700, fontSize: 14, marginTop: 2 },
+  stageGroupCard: {
+    background: COLORS.cardBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16,
+    boxShadow: "0 4px 14px rgba(16,35,84,.06)",
+  },
+  stageHeaderRow: { display: "flex", alignItems: "center", gap: 12, marginBottom: 14 },
+  stageIconBadge: {
+    display: "grid",
+    placeItems: "center",
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    background: "#FEF3C6",
+    fontSize: 20,
+    flexShrink: 0,
+  },
+  stageTitle: { fontSize: 17, fontWeight: 900, color: COLORS.textDark },
+  stageHint: { fontSize: 12, color: COLORS.textMuted, fontWeight: 600, marginTop: 2 },
+  stageGradeGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 10,
+  },
+  gradeChip: {
+    position: "relative",
+    border: `1px solid ${COLORS.border}`,
+    background: COLORS.bg,
+    borderRadius: 14,
+    padding: "16px 10px",
+    textAlign: "center",
+    cursor: "pointer",
+    fontFamily: FONT,
+  },
+  gradeChipDot: {
+    position: "absolute",
+    top: 8,
+    right: 10,
+    width: 6,
+    height: 6,
+    borderRadius: "50%",
+    background: COLORS.border,
+  },
+  gradeChipName: { fontWeight: 800, fontSize: 15, color: COLORS.textDark },
+  popularBadge: {
+    position: "absolute",
+    top: -10,
+    left: "50%",
+    transform: "translateX(50%)",
+    background: "#10B981",
+    color: "white",
+    fontSize: 10,
+    fontWeight: 800,
+    padding: "3px 10px",
+    borderRadius: 999,
   },
   subjectCard: {
     display: "flex",
