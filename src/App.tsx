@@ -3,20 +3,22 @@ import {
   GRADES,
   STAGES,
   SUBJECTS,
-  subjectsForGrade,
   UNITS_BY_SUBJECT,
   UNITS_BY_SUBJECT_KG1,
-  UNITS_BY_SUBJECT_KG2,
   lessonsForUnit,
   lessonsForUnitKG1,
-  lessonsForUnitKG2,
   questionsForLesson,
   questionsForLessonKG1,
-  questionsForLessonKG2,
   gradeBySlug,
   subjectBySlug,
   type QuizQ,
 } from "./data/catalog";
+import {
+  subjectsForGrade,
+  UNITS_BY_SUBJECT_KG2,
+  lessonsForUnitKG2,
+  questionsForLessonKG2,
+} from "./data/kg2";
 
 type Screen = "splash" | "grade" | "subjects" | "units" | "lesson" | "quiz" | "result";
 
@@ -70,11 +72,72 @@ export default function App() {
   return (
     <div style={styles.app}>
       {screen === "splash" && (
-        <div style={styles.center}>
-          <div style={{ fontSize: 64 }}>🎓</div>
-          <h1 style={styles.title}>تعلّم</h1>
-          <p style={styles.subtitle}>طريقك للنجاح يبدأ من هنا</p>
-          <button style={styles.primaryBtn} onClick={goHome}>ابدأ الآن ›</button>
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            textAlign: "center",
+            gap: 10,
+            background: "linear-gradient(160deg, #2e63e6, #102354)",
+            color: "#fff",
+          }}
+        >
+          <div
+            style={{
+              width: 84,
+              height: 84,
+              borderRadius: 999,
+              background: "#2455d6",
+              border: "3px solid rgba(255,255,255,.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 40,
+            }}
+          >
+            🎓
+          </div>
+          <h1 style={{ fontSize: 30, margin: 0 }}>تَعَلَّم</h1>
+          <p style={{ opacity: 0.85, margin: 0 }}>اِفْهَم • تَقَدَّم • تَمَيَّز</p>
+          <button
+            style={{
+              background: "#fff",
+              color: "#2455d6",
+              border: "none",
+              borderRadius: 999,
+              padding: "10px 24px",
+              fontWeight: 700,
+              cursor: "pointer",
+              marginTop: 8,
+            }}
+            onClick={goHome}
+          >
+            دخول الطالب
+          </button>
+          <h2 style={{ fontSize: 26, lineHeight: 1.6, margin: "24px 0 0" }}>
+            كلُّ درسٍ يقرّبك <br />
+            <span style={{ borderBottom: "4px solid #f6b91b", paddingBottom: 2 }}>من حُلمك</span>
+          </h2>
+          <button
+            style={{
+              background: "#f6b91b",
+              color: "#102354",
+              border: "none",
+              borderRadius: 999,
+              padding: "14px 28px",
+              fontSize: 16,
+              fontWeight: 800,
+              cursor: "pointer",
+              marginTop: 16,
+            }}
+            onClick={goHome}
+          >
+            ابدأ رحلتك الآن ›
+          </button>
         </div>
       )}
 
