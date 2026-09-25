@@ -1,6 +1,5 @@
-import { SUBJECTS } from "./catalog";
-import type { GradeDef, SubjectDef, UnitTemplate, LessonTemplate, QuizQ } from "./catalog";
 
+import { SUBJECTS, type GradeDef, type SubjectDef, type UnitTemplate, type LessonTemplate, type QuizQ } from "./catalog";
 export function subjectsForGrade(grade?: GradeDef): SubjectDef[] {
   if (grade?.stage === "early") {
     return SUBJECTS.filter((s) => ["math", "arabic", "english"].includes(s.slug));
