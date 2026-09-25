@@ -1,11 +1,4 @@
-
-import { SUBJECTS, type GradeDef, type SubjectDef, type UnitTemplate, type LessonTemplate, type QuizQ } from "./catalog";
-export function subjectsForGrade(grade?: GradeDef): SubjectDef[] {
-  if (grade?.stage === "early") {
-    return SUBJECTS.filter((s) => ["math", "arabic", "english"].includes(s.slug));
-  }
-  return SUBJECTS;
-}
+import type { UnitTemplate, LessonTemplate, QuizQ } from "./catalog";
 
 export const UNITS_BY_SUBJECT_KG2: Record<string, UnitTemplate[]> = {
   math: [
