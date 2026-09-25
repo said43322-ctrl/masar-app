@@ -14,11 +14,17 @@ import {
   type QuizQ,
 } from "./data/catalog";
 import {
-  subjectsForGrade,
   UNITS_BY_SUBJECT_KG2,
   lessonsForUnitKG2,
   questionsForLessonKG2,
 } from "./data/kg2";
+
+function subjectsForGrade(grade?: ReturnType<typeof gradeBySlug>) {
+  if (grade?.stage === "early") {
+    return SUBJECTS.filter((s) => ["math", "arabic", "english"].includes(s.slug));
+  }
+  return SUBJECTS;
+}
 
 type Screen = "splash" | "grade" | "subjects" | "units" | "lesson" | "quiz" | "result";
 
